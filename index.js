@@ -11,6 +11,7 @@ server.connection({
 
 var plugins = [
 	{ register: require('./routes/users.js') },
+	{ register: require('./routes/sessions.js')},
 	{ register: require('hapi-mongodb'),
 		options: {
 			url: "mongodb://127.0.0.1/hapi-twitter",
@@ -19,7 +20,17 @@ var plugins = [
 					native_parser: false
 				}
 			}
-		} }
+		} 
+	},
+	{ 
+		register: require('yar'),
+		options: {
+			cookieOptions: {
+				password: 'password',
+				isSecure: false
+			}
+		}
+	}
 ];
 
 server.register(plugins, function(err) {
