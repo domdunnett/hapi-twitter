@@ -1,4 +1,5 @@
 var Bcrypt = require('bcrypt');
+var Auth = require('./auth');
 
 exports.register = function(server, options, next) {
 
@@ -55,35 +56,37 @@ exports.register = function(server, options, next) {
 
 			}		
 		},
-
 //check if the user is logged in/authenticated
 		{
 			method: 'GET',
 			path: '/authenticated',
 			handler: function(request, reply) {
+				Auth.authenticated(request, function(result) {
+					reply(result);
+				});
+			}
+		},
+//log out/delete session
+		{
+			method: 'DELETE',
+			path: '/sessions',
+			handler: function(request, reply) {
 				var session = request.session.get('hapi-twitter-session');
+				
+				if(!session) {
+					return reply( { message: "Already logged out." } ); 
+				}
+
 				var db = request.server.plugins['hapi-mongodb'].db;
 
-				db.collection('sessions').findOne({ session_id: session.session_key }, function(err, result) {
-					if(result === null) {
-						return reply( {message: "Not authenticated"} );
-					}
-					else {
-						return reply( {message: "Authenticated."} );
-					}
-				});
+				db.collection('sessions').remove({ session_id: session.session_key }, function(err, writeResult) {
+					if (err) { return reply('Internal MongoDB error', err); }
 
+					reply(writeResult);
+
+				});
 			}
 		}
-//log out/delete session
-		// {
-		// 	method: 'DELETE',
-		// 	path: '/sessions',
-		// 	handler: function(request, reply) {
-		// 		var session = request.session.get('hapi-twitter-session');
-		// 		var db = request.server.plugins['hapi-mongodb'].db;
-		// 	}
-		// }
 
 	])
 
