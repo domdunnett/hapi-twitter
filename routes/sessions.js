@@ -4,6 +4,7 @@ exports.register = function(server, options, next) {
 
 	server.route([
 
+//sign in and create a session
 		{
 			method: 'POST',
 			path: '/sessions',
@@ -53,7 +54,36 @@ exports.register = function(server, options, next) {
 				});
 
 			}		
+		},
+
+//check if the user is logged in/authenticated
+		{
+			method: 'GET',
+			path: '/authenticated',
+			handler: function(request, reply) {
+				var session = request.session.get('hapi-twitter-session');
+				var db = request.server.plugins['hapi-mongodb'].db;
+
+				db.collection('sessions').findOne({ session_id: session.session_key }, function(err, result) {
+					if(result === null) {
+						return reply( {message: "Not authenticated"} );
+					}
+					else {
+						return reply( {message: "Authenticated."} );
+					}
+				});
+
+			}
 		}
+//log out/delete session
+		// {
+		// 	method: 'DELETE',
+		// 	path: '/sessions',
+		// 	handler: function(request, reply) {
+		// 		var session = request.session.get('hapi-twitter-session');
+		// 		var db = request.server.plugins['hapi-mongodb'].db;
+		// 	}
+		// }
 
 	])
 
