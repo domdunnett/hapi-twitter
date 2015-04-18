@@ -15,6 +15,7 @@ server.connection({
 var plugins = [
 	{ register: require('./routes/users.js') },
 	{ register: require('./routes/sessions.js')},
+	{ register: require('./routes/tweets.js')},
 	{ register: require('hapi-mongodb'),
 		options: {
 			url: "mongodb://127.0.0.1/hapi-twitter",
