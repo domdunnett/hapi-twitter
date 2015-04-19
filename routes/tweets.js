@@ -44,14 +44,19 @@ exports.register = function(server, options, next) {
 			method: 'GET',
 			path: '/users/{username}/tweets',
 			handler: function(request, reply) {
-        var user = encodeURIComponent(request.params.username);
+        var userQuery = encodeURIComponent(request.params.username);
         var db = request.server.plugins['hapi-mongodb'].db;
+				var ObjectID = request.server.plugins['hapi-mongodb'].ObjectID;
 
-        console.log(user);
+        console.log(userQuery);
         
-        db.collection('users').find( { 'username': user }, function(err, user) {
+        db.collection('users').findOne( { 'username': userQuery }, function(err, user) {
           if (err) { throw err; }
-          db.collection('tweets').find({ user_id: user._id }).toArray(function(err, userTweets) {
+					console.log(user);
+					console.log(typeof user._id);
+					var tweetId = user._id;
+					console.log(tweetId);
+          db.collection('tweets').find({ user_id: tweetId.toString() }).toArray(function(err, userTweets) {
           	if (err) { throw err; }
           	reply(userTweets);
           });
