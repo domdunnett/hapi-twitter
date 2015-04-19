@@ -83,6 +83,7 @@ exports.register = function(server, options, next) {
 							newTweet['user'] = user.username;
 							
 							db.collection('tweets').insert(newTweet, function(err, writeResult) {
+								console.log(newTweet);
 								if (err) { reply(Hapi.error.internal('Internal MongoDB Error', err)); }
 								else { reply(writeResult); }  
 							});
