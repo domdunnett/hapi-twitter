@@ -51,7 +51,7 @@ exports.register = function(server, options, next) {
 							});
 
 						}
-						else { reply( {message: "Not authorised"} )}
+						else { reply( false )}
 					});
 
 				});

@@ -15,7 +15,7 @@ exports.register = function(server, options, next) {
 
 				db.collection('tweets').find().toArray(function(err, tweets) {
 					if(err) { throw err; };
-					reply(tweets);
+					reply(tweets); 
 				});
 
 			}
@@ -52,12 +52,14 @@ exports.register = function(server, options, next) {
         
         db.collection('users').findOne( { 'username': userQuery }, function(err, user) {
           if (err) { throw err; }
-					console.log(user);
-					console.log(typeof user._id);
-					var tweetId = user._id;
-					console.log(tweetId);
-          db.collection('tweets').find({ user_id: tweetId.toString() }).toArray(function(err, userTweets) {
+					
+					if (user === null) {
+						return reply([]);
+					}
+					
+          db.collection('tweets').find({ user_id: ObjectID(user._id) }).toArray(function(err, userTweets) {
           	if (err) { throw err; }
+						
           	reply(userTweets);
           });
         });
@@ -74,7 +76,7 @@ exports.register = function(server, options, next) {
 				var newTweet = request.payload.tweet;
 				var session = request.session.get('hapi-twitter-session');
 				var ObjectID = request.server.plugins['hapi-mongodb'].ObjectID;
-				newTweet['user_id'] = session.user_id;
+				newTweet['user_id'] = ObjectID(session.user_id);
 				newTweet['date'] = new Date;
 				console.log(session.user_id);
 
